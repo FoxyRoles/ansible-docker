@@ -1,28 +1,43 @@
 ---
 
 - name: apt cache updated
-  apt: update_cache=True cache_valid_time=86400
+  apt:
+    update_cache: True
+    cache_valid_time: 86400
 
 - name: ensure basic packages are installed
-  apt: pkg={{ item }} state=present
-  with_items:
-   - apt-transport-https
-   - ca-certificates
-   - curl
-   - python-pip
-   - software-properties-common
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+     - apt-transport-https
+     - ca-certificates
+     - curl
+     - python3-pip
+     - software-properties-common
 
 - name: docker apt key present
-  apt_key: id=0EBFCD88 keyserver=keys.gnupg.net state=present
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
 
 - name: docker apt list present
-  apt_repository: repo='deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable' state=present update_cache=true
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    filename: docker-ce
+    state: present
+    update_cache: true
 
 - name: ensure docker package is installed
-  apt: pkg=docker-ce state=present
+  apt:
+    pkg: docker-ce
+    state: present
 
 - name: ensure docker-compose in installed
-  pip: name=docker-compose
+  pip:
+    name: docker-compose
+    state: present
 
 # GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"
 - name: ensure cgroup_enable is enabled in kernel
