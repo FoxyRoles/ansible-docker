@@ -14,48 +14,48 @@
      - apt-transport-https
      - ca-certificates
      - curl
-     - python3-pip
      - software-properties-common
 
 - name: docker apt key present
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
+  get_url:
+    url:  https://download.docker.com/linux/ubuntu/gpg
+    dest: /usr/share/keyrings/docker.asc
 
 - name: docker apt list present
   apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-    filename: docker-ce
+    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    filename: docker
     state: present
     update_cache: true
 
 - name: ensure docker package is installed
   apt:
-    pkg: docker-ce
+    name: "{{ packages }}"
     state: present
-
-- name: ensure docker-compose in installed
-  pip:
-    name: docker-compose
-    state: present
+  vars:
+    packages:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
 
 # GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"
-- name: ensure cgroup_enable is enabled in kernel
-  lineinfile:
-    state: present
-    dest: /etc/default/grub
-    backrefs: yes
-    regexp: '^(GRUB_CMDLINE_LINUX=(?!.*cgroup_enable)\"[^\"]+)(\".*)'
-    line: '\1 cgroup_enable=memory\2'
-  notify:
-   - update grub
+#- name: ensure cgroup_enable is enabled in kernel
+#  lineinfile:
+#    state: present
+#    dest: /etc/default/grub
+#    backrefs: yes
+#    regexp: '^(GRUB_CMDLINE_LINUX=(?!.*cgroup_enable)\"[^\"]+)(\".*)'
+#    line: '\1 cgroup_enable=memory\2'
+#  notify:
+#   - update grub
 
-- name: ensure swapaccount is enabled in kernel
-  lineinfile:
-    state: present
-    dest: /etc/default/grub
-    backrefs: yes
-    regexp: '^(GRUB_CMDLINE_LINUX=(?!.*swapaccount)\"[^\"]+)(\".*)'
-    line: '\1 swapaccount=1\2'
-  notify:
-   - update grub
+#- name: ensure swapaccount is enabled in kernel
+#  lineinfile:
+#    state: present
+#    dest: /etc/default/grub
+#    backrefs: yes
+#    regexp: '^(GRUB_CMDLINE_LINUX=(?!.*swapaccount)\"[^\"]+)(\".*)'
+#    line: '\1 swapaccount=1\2'
+#  notify:
+#   - update grub
