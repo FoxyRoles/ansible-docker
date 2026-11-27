@@ -33,7 +33,7 @@
   when: docker_legacy_repository is changed or docker_repository is changed
 
 - name: ensure docker package is installed
-  apt:
+  ansible.builtin.apt:
     name: "{{ packages }}"
     state: present
   vars:
@@ -42,24 +42,3 @@
       - docker-ce-cli
       - containerd.io
       - docker-compose-plugin
-
-# GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"
-#- name: ensure cgroup_enable is enabled in kernel
-#  lineinfile:
-#    state: present
-#    dest: /etc/default/grub
-#    backrefs: yes
-#    regexp: '^(GRUB_CMDLINE_LINUX=(?!.*cgroup_enable)\"[^\"]+)(\".*)'
-#    line: '\1 cgroup_enable=memory\2'
-#  notify:
-#   - update grub
-
-#- name: ensure swapaccount is enabled in kernel
-#  lineinfile:
-#    state: present
-#    dest: /etc/default/grub
-#    backrefs: yes
-#    regexp: '^(GRUB_CMDLINE_LINUX=(?!.*swapaccount)\"[^\"]+)(\".*)'
-#    line: '\1 swapaccount=1\2'
-#  notify:
-#   - update grub

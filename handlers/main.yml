@@ -1,4 +1,4 @@
 ---
 
 - name: update grub
-  raw: update-grub
+  ansible.builtin.raw: update-grub
